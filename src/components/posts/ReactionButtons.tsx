@@ -1,6 +1,6 @@
 import { useAppDispatch } from '../../store/reduxtypehooks';
 import {
-  initialPostStateType,
+  postStateType,
   reaction,
   reactionAdded,
 } from '../../store/slices/postsSlice';
@@ -13,7 +13,7 @@ enum reactionEmoji {
   coffee = '☕',
 }
 
-const ReactionButtons = ({ post }: { post: initialPostStateType }) => {
+const ReactionButtons = ({ post }: { post: postStateType }) => {
   const dispatch = useAppDispatch();
 
   const reactionButtons = Object.entries(reactionEmoji).map(([name, emoji]) => {
