@@ -19,40 +19,16 @@ export type postStateType = {
   date: string;
   reactions: reaction;
 };
-
+export type addNewPostType = {
+  body: string;
+  userId: string;
+  title: string;
+};
 type slicetype = {
   posts: postStateType[];
   loading: boolean;
   error: string | null;
 };
-// const initialState: initialPostStateType[] = [
-//   {
-//     id: '1',
-//     title: 'Learning Redux Toolkit',
-//     content: "I've heard good things.",
-//     date: sub(new Date(), { minutes: 10 }).toISOString(),
-//     reactions: {
-//       thumbsUp: 0,
-//       wow: 0,
-//       heart: 0,
-//       rocket: 0,
-//       coffee: 0,
-//     },
-//   },
-//   {
-//     id: '2',
-//     title: 'Slices...',
-//     content: 'The more I say slice, the more I want pizza.',
-//     date: sub(new Date(), { minutes: 5 }).toISOString(),
-//     reactions: {
-//       thumbsUp: 0,
-//       wow: 0,
-//       heart: 0,
-//       rocket: 0,
-//       coffee: 0,
-//     },
-//   },
-// ];
 
 const initialState: slicetype = {
   posts: [],
@@ -63,7 +39,13 @@ export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
   const response = await axios.get(POSTS_URL);
   return response.data;
 });
-
+export const addNewPosts = createAsyncThunk(
+  'posts/addNewPosts',
+  async (initialPost: addNewPostType) => {
+    const response = await axios.post(POSTS_URL, initialPost);
+    return response.data;
+  }
+);
 const postsSlice = createSlice({
   name: 'posts',
   initialState,
@@ -132,6 +114,18 @@ const postsSlice = createSlice({
         state.loading = false;
         state.posts = [];
         state.error = action.error.message || 'Something went wrong';
+      })
+      .addCase(addNewPosts.fulfilled, (state, action) => {
+        action.payload.userId = Number(action.payload.userId);
+        action.payload.date = new Date().toISOString();
+        action.payload.reactions = {
+          thumbsUp: 0,
+          wow: 0,
+          heart: 0,
+          rocket: 0,
+          coffee: 0,
+        };
+        state.posts.push(action.payload);
       });
   },
 });

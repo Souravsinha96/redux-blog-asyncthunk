@@ -1,6 +1,6 @@
 import { useState, ChangeEvent } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/reduxtypehooks';
-import { postAdded } from '../../store/slices/postsSlice';
+import { addNewPosts } from '../../store/slices/postsSlice';
 import { selectAllUsers } from '../../store/slices/usersSlice';
 
 const AddPostForm = () => {
@@ -9,6 +9,8 @@ const AddPostForm = () => {
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [userId, setUserId] = useState<string>('');
+
+  const [addRequestStatus, setAddRequestStatus] = useState('idle');
 
   const onTitleChanged = (e: ChangeEvent<HTMLInputElement>) =>
     setTitle(e.target.value);
@@ -19,14 +21,23 @@ const AddPostForm = () => {
   const onAuthorChanged = (e: ChangeEvent<HTMLSelectElement>) =>
     setUserId(e.target.value);
 
+  const canSave =
+    [title, content, userId].every(Boolean) && addRequestStatus === 'idle';
   const onSavePostClicked = () => {
-    if (title && content) {
-      dispatch(postAdded(title, content, userId));
-      setTitle('');
-      setContent('');
+    if (canSave) {
+      try {
+        setAddRequestStatus('pending');
+        dispatch(addNewPosts({ title, body: content, userId })).unwrap();
+        setTitle('');
+        setContent('');
+        setUserId('');
+      } catch (error) {
+        console.error('Failed to save post,', error);
+      } finally {
+        setAddRequestStatus('idle');
+      }
     }
   };
-  const canSave = Boolean(title) && Boolean(content) && Boolean(userId);
 
   const usersOptions = users.map((user) => (
     <option key={user.id} value={user.id}>
