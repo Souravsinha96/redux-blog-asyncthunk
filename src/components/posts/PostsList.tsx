@@ -1,21 +1,14 @@
-import { useEffect } from 'react';
-import { useAppSelector, useAppDispatch } from '../../store/reduxtypehooks';
+import { Link } from 'react-router-dom';
+import { useAppSelector } from '../../store/reduxtypehooks';
 import {
   selectAllPosts,
   getPostsStatus,
   getPostsError,
-  fetchPosts,
 } from '../../store/slices/postsSlice';
 import PostAuthor from './PostAuthor';
 import ReactionButtons from './ReactionButtons';
 import TimeAgo from './TimeAgo';
 function PostsList() {
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(fetchPosts());
-  }, [dispatch]);
-
   const posts = useAppSelector(selectAllPosts);
   const status = useAppSelector(getPostsStatus);
   const error = useAppSelector(getPostsError);
@@ -33,9 +26,11 @@ function PostsList() {
 
     content = orderedPosts.map((post) => (
       <article key={post.id}>
-        <h3>{post.title}</h3>
-        <p>{post.body.substring(0, 100)}</p>
+        <h2>{post.title}</h2>
+        <p className="excerpt">{post.body.substring(0, 75)}...</p>
         <p className="postcredit">
+          {' '}
+          <Link to={`post/${post.id}`}>View Post</Link>{' '}
           <PostAuthor userId={post?.userId} />
           <TimeAgo timestamp={post.date} />
         </p>{' '}
@@ -44,11 +39,6 @@ function PostsList() {
     ));
   }
 
-  return (
-    <section>
-      <h2>Posts</h2>
-      {content}
-    </section>
-  );
+  return <section>{content}</section>;
 }
 export default PostsList;

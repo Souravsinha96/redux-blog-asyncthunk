@@ -2,9 +2,10 @@ import { useState, ChangeEvent } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/reduxtypehooks';
 import { addNewPosts } from '../../store/slices/postsSlice';
 import { selectAllUsers } from '../../store/slices/usersSlice';
-
+import { useNavigate } from 'react-router-dom';
 const AddPostForm = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const users = useAppSelector(selectAllUsers);
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
@@ -31,6 +32,7 @@ const AddPostForm = () => {
         setTitle('');
         setContent('');
         setUserId('');
+        navigate('/');
       } catch (error) {
         console.error('Failed to save post,', error);
       } finally {
